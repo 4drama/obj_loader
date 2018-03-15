@@ -3,10 +3,34 @@
 
 #include <string>
 #include <fstream>
+#include <cstddef>
 
 #include <deque>
+#include <list>
 
 namespace objl{
+	
+	struct vertex;
+	struct normal;
+	struct texture_uv;
+	struct triangle;
+	struct group;
+	
+	struct object{
+		typedef std::deque<vertex> vertex_container_type;
+		typedef std::deque<normal> normal_container_type;
+		typedef std::deque<texture_uv> texture_uv_container_type;
+		typedef std::deque<triangle> triangle_container_type;
+		typedef std::list<group> group_container_type;
+		
+		vertex_container_type 		vertexes;
+		normal_container_type 		normals;
+		texture_uv_container_type 	textures_uv;
+		triangle_container_type		triangles;
+		group_container_type		groups;
+	};
+	
+	object obj_loader(const std::string& filename);
 	
 	struct vertex{
 		float x, y, z;
@@ -21,20 +45,20 @@ namespace objl{
 	};
 	
 	struct triangle{
-		unsigned int ix1, ix2, ix3;
-	};
-	
-	struct object{
-		typedef std::deque<vertex> vertex_container_type;
-		typedef std::deque<normal> normal_container_type;
-		typedef std::deque<texture_uv> texture_uv_container_type;
+		typedef std::size_t vertex_index_type;
+		typedef std::size_t texture_uv_index_type;
+		typedef std::size_t normal_index_type;
 		
-		vertex_container_type vertexes;
-		normal_container_type normals;
-		texture_uv_container_type textures_uv;
+		vertex_index_type 		vertex_first, 	vertex_second, 	vertex_third;
+		texture_uv_index_type 	uv_first, 		uv_second, 		uv_third;
+		normal_index_type 		normal_first, 	normal_second, 	normal_third;
 	};
 	
-	object obj_loader(const std::string& filename);
+	struct group{
+		std::string name;
+		std::size_t start_index;
+		group *next;
+	};
 	
 }
 
