@@ -173,11 +173,8 @@ namespace{
 		
 		new_group.name = name;
 		new_group.start_index = vertexes.size();
-		new_group.next = nullptr;
 		
-		objl::group* old_last = &groups.back();
 		groups.push_back(new_group);
-		old_last->next = &groups.back();
 		
 		obj_file >> next_cmd;
 	}

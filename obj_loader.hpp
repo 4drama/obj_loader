@@ -57,7 +57,6 @@ namespace objl{
 	struct group{
 		std::string name;
 		std::size_t start_index;
-		group *next;
 	};
 	
 }
