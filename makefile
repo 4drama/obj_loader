@@ -4,7 +4,8 @@ all:
 	gcc -std=c++14 -c -I$(DX_PATH)\Include test.cpp -o test.o
 	gcc -std=c++14 -c -I$(DX_PATH)\Include dx_init.cpp -o dx_init.o
 	gcc -std=c++14 -c obj_loader.cpp -o obj_loader.o
-	gcc test.o obj_loader.o dx_init.o -o test.exe -L$(DX_PATH)\LIB -lstdc++ -lD3dx9 -lgdi32
+	gcc test.o obj_loader.o dx_init.o -o test.exe -L$(DX_PATH)\LIB -lstdc++ -lD3dx9 \
+-lgdi32 -ld3d9 -lwinmm
 	
 clean:
 	rm -rf *.o test.exe
