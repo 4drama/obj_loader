@@ -46,11 +46,11 @@ objl::object objl::obj_loader(const std::string& filename){
 		} else if(cmd == "g"){
 			group_parser(load_objct.groups, load_objct.vertexes, obj_file, cmd);
 		} else if(cmd == "usemtl"){
-			
+			obj_file >> cmd;	//TODO
 		} else if(cmd == "mtllib"){
-			
+			obj_file >> cmd;	//TODO
 		} else if(cmd == "o"){
-			
+			obj_file >> cmd;	//TODO
 		} else
 			obj_file >> cmd;		
 	}

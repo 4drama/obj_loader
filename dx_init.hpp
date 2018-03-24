@@ -15,6 +15,4 @@ LRESULT CALLBACK WindowProc(
 int dx_init(std::string app_name, HINSTANCE hInstance, int width, int height,
 		bool windowed, D3DDEVTYPE device_type, IDirect3DDevice9** device);
 
-int MsgLoop(bool (*ptr_display)(float timeDelta));	
-
 #endif

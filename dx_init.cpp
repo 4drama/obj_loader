@@ -68,28 +68,6 @@ int dx_init(std::string app_name, HINSTANCE hInstance, int width, int height,
 	return 0;
 }
 
-int MsgLoop(bool (*ptr_display)(float timeDelta)){
-	MSG msg;
-	std::memset(&msg, 0, sizeof(MSG));
-	
-	static float lastTime = (float)timeGetTime();
-	
-	while(msg.message != WM_QUIT){
-		if(PeekMessage(&msg, 0, 0, 0, PM_REMOVE)){
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}else{
-			float currTime  = (float)timeGetTime();
-			float timeDelta = (currTime - lastTime)*0.001f;
-			
-			ptr_display(timeDelta);
-			
-			lastTime = currTime;
-		}
-	}
-	return msg.wParam;
-}
-
 namespace{
 	int win_init_(std::string app_name, HINSTANCE hInstance, int width, int height,
 			HWND *hwnd){
@@ -107,9 +85,22 @@ namespace{
 			return -1;
 		}		
 		
+		LONG top, left;
+		top = 0;
+		left = 0;
+		
+		APPBARDATA taskbar;
+		std::memset(&taskbar, 0, sizeof(APPBARDATA));
+		SHAppBarMessage(ABM_GETTASKBARPOS, &taskbar);	
+		
+		if(taskbar.uEdge == ABE_TOP)
+			top = taskbar.rc.bottom;
+		else if(taskbar.uEdge == ABE_LEFT)
+			left = taskbar.rc.right;
+		
 		*hwnd = CreateWindow(app_name.c_str(), app_name.c_str(), 
 			WS_EX_TOPMOST,
-			0, GetSystemMetrics(SM_CYMAXTRACK) - GetSystemMetrics(SM_CYMAXIMIZED),
+			left, top,
 			width, height, 0, 0, hInstance, 0); 
 		
 		if( !(*hwnd) ){

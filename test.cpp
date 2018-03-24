@@ -1,8 +1,9 @@
 #include "obj_loader.hpp"
 
-#include "dx_init.hpp"
+#include "dx_app.hpp"
 
 #include <iostream>
+#include <cstring>
 
 LRESULT CALLBACK WindowProc(
 	_In_ HWND   hwnd, 	_In_ UINT   uMsg,
@@ -10,23 +11,20 @@ LRESULT CALLBACK WindowProc(
 	if(uMsg == WM_KEYDOWN){
 		if(wParam == VK_ESCAPE)
 			DestroyWindow(hwnd);
+	} else if (uMsg == WM_DESTROY){
+		PostQuitMessage(0);
 	}
 	
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-bool display(float time){
-	
-}
-
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE prevInstance,
 		LPSTR cmdLine, int showCmd){
 	
-	IDirect3DDevice9* Device = 0;	
-	dx_init("obj_loader", hinstance, 1400, 900, true, D3DDEVTYPE_HAL, &Device);
+	dx_app App(hinstance);
+	App.setup();
+	App.msg_loop();
 	
-	MsgLoop(display);
-	
-	objl::obj_loader("test.txt");
+//	objl::obj_loader("test.txt");
 	return 0;
 }
