@@ -2,7 +2,6 @@
 
 #include "obj_loader.hpp"
 
-#include <stdexcept>
 #include <iostream>
 
 const DWORD vertex::FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;

@@ -1,7 +1,5 @@
 #include "obj_loader.hpp"
 
-#include <iostream>
-
 namespace{
 	void vertex_parser(	objl::object::vertex_container_type 	&vertexes,
 						std::fstream 							&obj_file,
@@ -74,9 +72,6 @@ namespace{
 			next_cmd = w;
 		else
 			obj_file >> next_cmd;
-		
-		std::cerr << new_vertex.x << ' ' 
-			<< new_vertex.y << ' ' << new_vertex.z << '\n';
 		
 		vertexes.push_back(new_vertex);
 	}
