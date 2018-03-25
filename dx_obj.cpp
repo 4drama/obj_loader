@@ -7,28 +7,68 @@
 
 const DWORD vertex::FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 
+namespace {
+	void add_vertex(const objl::vertex &input_obj_vertex, vertex &output_dx_vertex){
+		output_dx_vertex.x = input_obj_vertex.x;
+		output_dx_vertex.y = input_obj_vertex.y;
+		output_dx_vertex.z = input_obj_vertex.z;
+	}
+	
+	void add_normal(const objl::normal &input_obj_normal, vertex &output_dx_vertex){
+		output_dx_vertex.nx = input_obj_normal.xn;
+		output_dx_vertex.ny = input_obj_normal.yn;
+		output_dx_vertex.nz = input_obj_normal.zn;
+	}
+	
+	void add_texture_uv(const objl::texture_uv &texture_uv_obj_vertex, 
+			vertex &output_dx_vertex){
+		output_dx_vertex.u = texture_uv_obj_vertex.u;
+		output_dx_vertex.v = texture_uv_obj_vertex.v;
+	}
+	
+	vertex create_vertex(	const objl::vertex &input_obj_vertex,
+							const objl::normal &input_obj_normal,
+							const objl::texture_uv &texture_uv_obj_vertex){
+		vertex res;
+		add_vertex(input_obj_vertex, res);
+		add_normal(input_obj_normal, res);
+		add_texture_uv(texture_uv_obj_vertex, res);
+		return res;
+	}
+	
+	triangle next_triangle(std::size_t first_index){
+		triangle res;
+		res.index[0] = first_index;
+		res.index[1] = first_index + 1;
+		res.index[2] = first_index + 2;
+		return res;
+	}
+}
+
 dx_obj load_file(const std::string& filename){	
 	objl::object obj = objl::obj_loader(filename);
-	
-/*	if( (	obj.vertexes.size() != obj.normals.size()) ||
-		(	obj.normals.size() != obj.textures_uv.size()) ){
-		std::cerr << "obj.vertexes.size " << obj.vertexes.size() << std::endl;
-		std::cerr << "obj.normals.size " << obj.normals.size() << std::endl;
-		std::cerr << "obj.textures_uv.size " << obj.textures_uv.size() << std::endl;
-		throw std::logic_error("Object not full.");
-	}*/
-	
 	dx_obj result;
-/*	result.vertexes.reserve(obj.vertexes.size());
-	result.vertexes.resize(obj.vertexes.size());
 	
-	for(int i = 0; i != obj.vertexes.size(); ++i){
-		vertex v{obj.vertexes[i].x, obj.vertexes[i].y, obj.vertexes[i].z,
-			obj.normals[i].xn, obj.normals[i].yn, obj.normals[i].zn,
-			obj.textures_uv[i].u, obj.textures_uv[i].v};
+	for(auto &current_triangle : obj.triangles){
+		result.indices.push_back(next_triangle(result.vertexes.size()));
 		
-		result.vertexes[i] = v;
-	}*/
+		result.vertexes.push_back(create_vertex(
+				obj.vertexes[current_triangle.vertex_first],
+				obj.normals[current_triangle.normal_first],
+				obj.textures_uv[current_triangle.uv_first]));
+				
+		result.vertexes.push_back(create_vertex(
+				obj.vertexes[current_triangle.vertex_second],
+				obj.normals[current_triangle.normal_second],
+				obj.textures_uv[current_triangle.uv_second]));
+				
+		result.vertexes.push_back(create_vertex(
+				obj.vertexes[current_triangle.vertex_third],
+				obj.normals[current_triangle.normal_third],
+				obj.textures_uv[current_triangle.uv_third]));
+		
+		
+	}
 	
 	return result;
 }

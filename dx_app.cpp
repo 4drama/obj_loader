@@ -17,11 +17,7 @@ void dx_app::setup(){
 }
 
 void dx_app::cleanup(){
-	if(vb != 0)
-		vb->Release();
 	
-	if(ib != 0)
-		ib->Release();
 }
 
 void dx_app::display(float time){

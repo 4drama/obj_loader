@@ -17,9 +17,6 @@ public:
 private:
 	IDirect3DDevice9* device;
 	
-	IDirect3DVertexBuffer9* vb = 0;
-	IDirect3DIndexBuffer9* ib = 0;
-	
 	void display(float time);
 	void cleanup();
 };

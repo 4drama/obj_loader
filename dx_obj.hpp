@@ -14,8 +14,13 @@ struct vertex{
 	static const DWORD FVF;
 };
 
+struct triangle{
+	std::size_t index[3];
+};
+
 struct dx_obj{
 	std::vector<vertex> vertexes;
+	std::vector<triangle> indices;
 };
 
 dx_obj load_file(const std::string& filename);
