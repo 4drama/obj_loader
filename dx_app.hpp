@@ -5,6 +5,7 @@
 #include <d3dx9.h>
 
 #include "index_list.hpp"
+#include "dx_obj.hpp"
 
 struct camera{
 	D3DXVECTOR3 position;
@@ -28,12 +29,13 @@ private:
 	
 	camera main_cam;
 	index_list<D3DLIGHT9> lights;
+	dx_obj obj;
 	
 	void display(float time);
 	void cleanup();
 	void set_view(const camera &cam);
 	void set_perspective();
-	std::size_t add_light(D3DLIGHT9 light);
+	std::size_t add_light(D3DLIGHT9 light, D3DLIGHT9 **light_ptr);
 	void del_light(std::size_t index);
 };
 

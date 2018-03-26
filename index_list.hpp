@@ -18,6 +18,8 @@ public:
 			this->head->index = 0;
 			this->head->data = data_;
 			this->head->next = nullptr;
+			if(res != nullptr)
+				*res = &this->head->data;
 			return this->head->index;
 		}
 		

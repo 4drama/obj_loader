@@ -21,8 +21,12 @@ struct triangle{
 struct dx_obj{
 	std::vector<vertex> vertexes;
 	std::vector<triangle> indices;
+	
+	IDirect3DVertexBuffer9* VB = 0;
+	IDirect3DIndexBuffer9* IB = 0;
 };
 
 dx_obj load_file(const std::string& filename);
+void load_to_device(IDirect3DDevice9* device, dx_obj &obj);
 
 #endif

@@ -1,8 +1,27 @@
 #include "dx_app.hpp"
 #include "dx_init.hpp"
-#include "dx_obj.hpp"
 
 #include <cstring>
+
+#include <iostream>
+
+
+namespace{
+	 D3DLIGHT9 create_light(D3DXVECTOR3 pos){
+		D3DLIGHT9 dir;
+		ZeroMemory(&dir, sizeof(dir));
+		dir.Type = D3DLIGHT_POINT;
+		dir.Diffuse = (D3DXCOLOR)D3DCOLOR_XRGB(255, 255, 255) * 0.3f;
+		dir.Specular = (D3DXCOLOR)D3DCOLOR_XRGB(255, 255, 255) * 0.6f;
+		dir.Ambient = (D3DXCOLOR)D3DCOLOR_XRGB(255, 255, 255) * 0.6f;
+		dir.Range = 10;
+		dir.Attenuation0 = 0.4f;
+		dir.Attenuation1 = 0.2f;
+		dir.Attenuation2 = 0.05f;
+		dir.Position = pos;
+		return dir;
+	 }
+}
 
 dx_app::dx_app(HINSTANCE hInstance){
 	
@@ -23,6 +42,9 @@ void dx_app::setup(){
 	this->main_cam.target = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	this->main_cam.up = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	
+	D3DLIGHT9 light = create_light(D3DXVECTOR3(0.0f, 1.7f, -4.0f));
+	this->add_light(light, nullptr);
+	
 	this->device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	this->device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	this->device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
@@ -34,7 +56,8 @@ void dx_app::setup(){
 	this->set_perspective();
 	this->set_view(this->main_cam);
 	
-	load_file("test.txt");
+	this->obj = load_file("test.txt");
+	load_to_device(this->device, this->obj);
 }
 
 void dx_app::cleanup(){
@@ -42,7 +65,19 @@ void dx_app::cleanup(){
 }
 
 void dx_app::display(float time){
+	this->device->Clear(0, 0,
+		D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
+		0x000000ff, 1.0f, 0);
+	this->device->BeginScene();
 	
+/*	this->device->SetStreamSource(0, VB, 0, sizeof(Vertex));
+	this->device->SetIndices(IB);
+	
+	this->device->SetFVF(Vertex::FVF);
+	this->device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,
+		0, 0, v_count, 0, i_count);*/
+	this->device->EndScene();
+	this->device->Present(0, 0, 0, 0);
 }
 
 void dx_app::set_view(const camera &cam){
@@ -62,12 +97,14 @@ void dx_app::set_perspective(){
 	this->device->SetTransform(D3DTS_PROJECTION, &proj);
 }
 
-std::size_t dx_app::add_light(D3DLIGHT9 light){
-	D3DLIGHT9 *light_ptr;
-	std::size_t i = this->lights.add(light, &light_ptr);
-	
-	this->device->SetLight(i, light_ptr);
+std::size_t dx_app::add_light(D3DLIGHT9 light, D3DLIGHT9 **light_ptr){
+	D3DLIGHT9 *new_light_ptr;
+	std::size_t i = this->lights.add(light, &new_light_ptr);
+	this->device->SetLight(i, new_light_ptr);
 	this->device->LightEnable(i, true);
+	
+	if(light_ptr != nullptr)
+		*light_ptr = new_light_ptr;
 	return i;
 }
 
