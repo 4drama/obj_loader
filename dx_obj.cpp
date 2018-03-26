@@ -80,22 +80,11 @@ void load_to_device(IDirect3DDevice9* device, dx_obj &obj){
 		0);
 	vertex* vertices_ptr;
 	
-	device->CreateIndexBuffer(
-		obj.vertexes.size() * sizeof(WORD),
-		D3DUSAGE_WRITEONLY,
-		D3DFMT_INDEX16,
-		D3DPOOL_MANAGED,
-		&obj.IB,
-		0);
-	WORD* indices_ptr = 0;
-	
-	obj.IB->Lock(0, 0, (void**)&indices_ptr, 0);
 	obj.VB->Lock(0, 0, (void**)&vertices_ptr, 0);
 	
 	for(int i = 0; i != obj.vertexes.size(); i++){
 		vertices_ptr[i] = obj.vertexes[i];
-		indices_ptr[i] = i;
 	}
 	obj.VB->Unlock();
-	obj.IB->Unlock();
+	obj.triangles_size = obj.vertexes.size() / 3;
 }

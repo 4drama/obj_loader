@@ -23,7 +23,7 @@ struct dx_obj{
 	std::vector<triangle> indices;
 	
 	IDirect3DVertexBuffer9* VB = 0;
-	IDirect3DIndexBuffer9* IB = 0;
+	std::size_t triangles_size;
 };
 
 dx_obj load_file(const std::string& filename);

@@ -70,12 +70,10 @@ void dx_app::display(float time){
 		0x000000ff, 1.0f, 0);
 	this->device->BeginScene();
 	
-/*	this->device->SetStreamSource(0, VB, 0, sizeof(Vertex));
-	this->device->SetIndices(IB);
+	this->device->SetStreamSource(0, this->obj.VB, 0, sizeof(vertex));
+	this->device->SetFVF(vertex::FVF);
+	this->device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, this->obj.triangles_size);
 	
-	this->device->SetFVF(Vertex::FVF);
-	this->device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,
-		0, 0, v_count, 0, i_count);*/
 	this->device->EndScene();
 	this->device->Present(0, 0, 0, 0);
 }
