@@ -114,7 +114,7 @@ namespace{
 					objl::triangle::normal_index_type &n){
 		
 		std::string::size_type first_slash = arg.find('/', 1);
-		std::string::size_type second_slash = arg.find('/', 2);
+		std::string::size_type second_slash = arg.find('/', first_slash + 1);
 		
 		if (first_slash == std::string::npos)
 			first_slash = arg.length();

@@ -38,12 +38,20 @@ dx_app::~dx_app(){
 
 void dx_app::setup(){
 	
-	this->main_cam.position = D3DXVECTOR3(0.0f, 0.0f, -5.0f);
+	this->main_cam.position = D3DXVECTOR3(3.0f, 0.0f, 2.0f);
 	this->main_cam.target = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	this->main_cam.up = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	this->main_cam.up = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
 	
-	D3DLIGHT9 light = create_light(D3DXVECTOR3(0.0f, 1.7f, -4.0f));
+	D3DLIGHT9 light = create_light(D3DXVECTOR3(3.0f, 0.0f, 2.0f));
 	this->add_light(light, nullptr);
+	
+	D3DMATERIAL9 mtrl;
+		mtrl.Ambient = (D3DXCOLOR)D3DCOLOR_XRGB(255, 255, 255);
+		mtrl.Diffuse = (D3DXCOLOR)D3DCOLOR_XRGB(255, 255, 255);
+		mtrl.Specular = (D3DXCOLOR)D3DCOLOR_XRGB(255, 255, 255);
+		mtrl.Emissive = (D3DXCOLOR)D3DCOLOR_XRGB(0, 0, 0);
+		mtrl.Power = 2.0f;
+	this->device->SetMaterial(&mtrl);
 	
 	this->device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	this->device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
@@ -65,17 +73,21 @@ void dx_app::cleanup(){
 }
 
 void dx_app::display(float time){
-	this->device->Clear(0, 0,
-		D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
-		0x000000ff, 1.0f, 0);
-	this->device->BeginScene();
-	
-	this->device->SetStreamSource(0, this->obj.VB, 0, sizeof(vertex));
-	this->device->SetFVF(vertex::FVF);
-	this->device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, this->obj.triangles_size);
-	
-	this->device->EndScene();
-	this->device->Present(0, 0, 0, 0);
+	if( this->device ){
+		this->device->Clear(0, 0,
+			D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
+			0x000000ff, 1.0f, 0);
+		this->device->BeginScene();
+		
+		this->set_view(this->main_cam);
+		
+		this->device->SetStreamSource(0, this->obj.VB, 0, sizeof(vertex));
+		this->device->SetFVF(vertex::FVF);
+		this->device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, this->obj.triangles_size);
+		
+		this->device->EndScene();
+		this->device->Present(0, 0, 0, 0);
+	}
 }
 
 void dx_app::set_view(const camera &cam){

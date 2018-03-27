@@ -52,19 +52,19 @@ dx_obj load_file(const std::string& filename){
 		result.indices.push_back(next_triangle(result.vertexes.size()));
 		
 		result.vertexes.push_back(create_vertex(
-				obj.vertexes[current_triangle.vertex_first],
-				obj.normals[current_triangle.normal_first],
-				obj.textures_uv[current_triangle.uv_first]));
+				obj.vertexes[current_triangle.vertex_first - 1],
+				obj.normals[current_triangle.normal_first - 1],
+				obj.textures_uv[current_triangle.uv_first - 1]));
 				
 		result.vertexes.push_back(create_vertex(
-				obj.vertexes[current_triangle.vertex_second],
-				obj.normals[current_triangle.normal_second],
-				obj.textures_uv[current_triangle.uv_second]));
+				obj.vertexes[current_triangle.vertex_second - 1],
+				obj.normals[current_triangle.normal_second - 1],
+				obj.textures_uv[current_triangle.uv_second - 1]));
 				
 		result.vertexes.push_back(create_vertex(
-				obj.vertexes[current_triangle.vertex_third],
-				obj.normals[current_triangle.normal_third],
-				obj.textures_uv[current_triangle.uv_third]));		
+				obj.vertexes[current_triangle.vertex_third - 1],
+				obj.normals[current_triangle.normal_third - 1],
+				obj.textures_uv[current_triangle.uv_third - 1]));		
 	}	
 	return result;
 }
@@ -82,7 +82,7 @@ void load_to_device(IDirect3DDevice9* device, dx_obj &obj){
 	
 	obj.VB->Lock(0, 0, (void**)&vertices_ptr, 0);
 	
-	for(int i = 0; i != obj.vertexes.size(); i++){
+	for(int i = 0; i != obj.vertexes.size(); ++i){
 		vertices_ptr[i] = obj.vertexes[i];
 	}
 	obj.VB->Unlock();
