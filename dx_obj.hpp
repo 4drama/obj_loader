@@ -20,13 +20,20 @@ struct triangle{
 
 struct dx_obj{
 	std::vector<vertex> vertexes;
-	std::vector<triangle> indices;
 	
 	IDirect3DVertexBuffer9* VB = 0;
 	std::size_t triangles_size;
+	
+	D3DXMATRIX translation;
+	D3DXMATRIX rotation_x;
+	D3DXMATRIX rotation_y;
+	D3DXMATRIX rotation_z;
+	D3DXMATRIX scaling;
 };
 
-dx_obj load_file(const std::string& filename);
+D3DXMATRIX get_transform_matrix(dx_obj &obj);
+
+dx_obj load_file(const std::string& path, const std::string& filename);
 void load_to_device(IDirect3DDevice9* device, dx_obj &obj);
 
 #endif

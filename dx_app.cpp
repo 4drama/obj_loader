@@ -64,8 +64,14 @@ void dx_app::setup(){
 	this->set_perspective();
 	this->set_view(this->main_cam);
 	
-	this->obj = load_file("test.txt");
+	this->obj = load_file("./challenger/", "CHALLENGER71.obj");
 	load_to_device(this->device, this->obj);
+	
+	D3DXMatrixScaling(&this->obj.scaling, 1, 1, 1);
+	D3DXMatrixTranslation(&this->obj.translation, 0, 0, 0);
+	D3DXMatrixRotationX(&this->obj.rotation_x, 0);
+	D3DXMatrixRotationY(&this->obj.rotation_y, 0);
+	D3DXMatrixRotationZ(&this->obj.rotation_z, 0);
 }
 
 void dx_app::cleanup(){
@@ -83,6 +89,10 @@ void dx_app::display(float time){
 		
 		this->device->SetStreamSource(0, this->obj.VB, 0, sizeof(vertex));
 		this->device->SetFVF(vertex::FVF);
+
+		D3DXMATRIX transform = get_transform_matrix(this->obj);
+		this->device->SetTransform(D3DTS_WORLD, &transform);
+		
 		this->device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, this->obj.triangles_size);
 		
 		this->device->EndScene();

@@ -23,9 +23,12 @@ namespace{
 						std::string									&next_cmd);
 }
 
-objl::object objl::obj_loader(const std::string& filename){
+objl::object objl::obj_loader(const std::string& path, const std::string& filename){
 	
-	std::fstream obj_file(filename, std::ios::in);	
+	std::string full_path = path;
+	full_path.append(filename);
+	
+	std::fstream obj_file(full_path, std::ios::in);	
 	std::string cmd;
 	
 	objl::object load_objct;

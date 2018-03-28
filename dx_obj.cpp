@@ -44,12 +44,16 @@ namespace {
 	}
 }
 
-dx_obj load_file(const std::string& filename){	
-	objl::object obj = objl::obj_loader(filename);
+D3DXMATRIX get_transform_matrix(dx_obj &obj){
+	return obj.scaling * obj.rotation_x
+			* obj.rotation_y * obj.rotation_z * obj.translation;
+}
+
+dx_obj load_file(const std::string& path, const std::string& filename){	
+	objl::object obj = objl::obj_loader(path, filename);
 	dx_obj result;
 	
 	for(auto &current_triangle : obj.triangles){
-		result.indices.push_back(next_triangle(result.vertexes.size()));
 		
 		result.vertexes.push_back(create_vertex(
 				obj.vertexes[current_triangle.vertex_first - 1],

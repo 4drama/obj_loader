@@ -30,7 +30,7 @@ namespace objl{
 		group_container_type		groups;
 	};
 	
-	object obj_loader(const std::string& filename);
+	object obj_loader(const std::string& path, const std::string& filename);
 	
 	struct vertex{
 		float x, y, z;
