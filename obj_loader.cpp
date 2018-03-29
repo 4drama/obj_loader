@@ -1,4 +1,5 @@
 #include "obj_loader.hpp"
+#include "mtl_loader.hpp"
 
 namespace{
 	void vertex_parser(	objl::object::vertex_container_type 	&vertexes,
@@ -49,7 +50,10 @@ objl::object objl::obj_loader(const std::string& path, const std::string& filena
 		} else if(cmd == "usemtl"){
 			obj_file >> cmd;	//TODO
 		} else if(cmd == "mtllib"){
-			obj_file >> cmd;	//TODO
+			std::string mtl_file_name;
+			obj_file >> mtl_file_name;
+			objl::mtl_loader(path, mtl_file_name);
+			obj_file >> cmd;
 		} else if(cmd == "o"){
 			obj_file >> cmd;	//TODO
 		} else
