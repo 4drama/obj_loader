@@ -55,6 +55,14 @@ namespace{
 	void specular_exponent_parser(	objl::mtl &material, 
 									std::fstream &mtl_file, 
 									std::string &cmd);
+									
+	void illumination_models_parser(	objl::mtl &material, 
+										std::fstream &mtl_file, 
+										std::string &cmd);
+	
+	void texture_parser (		std::string &texture, 
+								std::fstream &mtl_file, 
+								std::string &cmd);
 }
 
 namespace{
@@ -76,25 +84,25 @@ namespace{
 			} else if (cmd == "Ks"){
 				specular_color_parser(material, mtl_file, cmd);
 			} else if (cmd == "Ns"){
-				mtl_file >> cmd;	//TODO
+				specular_exponent_parser(material, mtl_file, cmd);
 			} else if (cmd == "d"){
 				mtl_file >> cmd;	//TODO
 			} else if (cmd == "Tr"){
 				mtl_file >> cmd;	//TODO
 			} else if (cmd == "illum"){
-				mtl_file >> cmd;	//TODO
+				illumination_models_parser(material, mtl_file, cmd);
 			} else if (cmd == "map_kA"){
-				mtl_file >> cmd;	//TODO
+				texture_parser(material.ambient_texture, mtl_file, cmd);
 			} else if (cmd == "map_Kd"){
-				mtl_file >> cmd;	//TODO
+				texture_parser(material.diffuse_texture, mtl_file, cmd);
 			} else if (cmd == "map_kS"){
-				mtl_file >> cmd;	//TODO
+				texture_parser(material.specular_color_texture, mtl_file, cmd);
 			} else if (cmd == "map_Ns"){
-				mtl_file >> cmd;	//TODO
+				texture_parser(material.specular_highlight, mtl_file, cmd);
 			} else if (cmd == "map_d"){
-				mtl_file >> cmd;	//TODO
+				texture_parser(material.alpha_texture, mtl_file, cmd);
 			} else if (cmd == "bump" || cmd == "map_bump"){
-				mtl_file >> cmd;	//TODO
+				texture_parser(material.bump, mtl_file, cmd);
 			} else if (cmd == "disp"){
 				mtl_file >> cmd;	//TODO
 			} else if (cmd == "decal"){
@@ -102,7 +110,7 @@ namespace{
 			} else if (cmd == "map_opacity"){
 				mtl_file >> cmd;	//TODO
 			} else if (cmd == "refl"){
-				mtl_file >> cmd;	//TODO
+				texture_parser(material.reflection, mtl_file, cmd);
 			} else
 				mtl_file >> cmd;	
 		}
@@ -144,54 +152,101 @@ namespace{
 		std::cerr << std::endl;
 	}
 	
+	std::stringstream get_stream_line(std::fstream &file){
+		std::string line;
+		std::stringstream line_stream;
+		std::getline(file, line);
+		line_stream << line;
+		return line_stream;
+	}
+	
+	void three_arguments_parcer(	float arg[], 
+									std::fstream &mtl_file, 
+									std::string &cmd){
+		
+		std::stringstream line_stream = get_stream_line(mtl_file);
+
+		try {
+			for(int i = 0; i != 3; i++){
+				if(!line_stream.eof()){
+					line_stream >> arg[i];
+				}else
+					throw std::range_error("insufficient data");
+			}
+		} catch(const std::range_error& e){
+			for(int i = 0; i != 3; i++)
+				arg[i] = 0;
+		} catch(const std::exception& e){
+			throw e;
+		}
+
+		mtl_file >> cmd;	
+	}
+	
 	void ambient_color_parser(	objl::mtl &material, 
 								std::fstream &mtl_file, 
 								std::string &cmd){
 		
-	std::string line;
-	std::stringstream line_stream;
-	std::getline(mtl_file, line);
-	line_stream << line;
-	
-	try {
-		for(int i = 0; i != 3; i++){
-			if(!line_stream.eof()){
-				line_stream >> material.ambient_color[i];
-			}else
-				throw std::range_error("insufficient data");
-		}
-	} catch(const std::range_error& e){
-		for(int i = 0; i != 3; i++)
-			material.ambient_color[i] = 0;
-	} catch(const std::exception& e){
-		throw e;
-	}
-	
-	mtl_file >> cmd;
-	
+		three_arguments_parcer(material.ambient_color, mtl_file, cmd);
 	}
 	
 	void diffuse_color_parser(	objl::mtl &material, 
 								std::fstream &mtl_file, 
 								std::string &cmd){
-		mtl_file 	>> material.diffuse_color[0]
-					>> material.diffuse_color[1]
-					>> material.diffuse_color[2]
-					>> cmd;
+		three_arguments_parcer(material.diffuse_color, mtl_file, cmd);
 	}
 	
 	void specular_color_parser(	objl::mtl &material, 
 								std::fstream &mtl_file, 
 								std::string &cmd){
-		mtl_file 	>> material.specular_color[0]
-					>> material.specular_color[1]
-					>> material.specular_color[2]
-					>> cmd;
+		three_arguments_parcer(material.specular_color, mtl_file, cmd);
+	}
+	
+	template<class T>
+	void arg_save(std::string &line, T &arg){
+		std::stringstream line_stream;
+		line_stream << line.substr(1);
+		line_stream >> arg;
+	}
+	
+	void arg_save(std::string &line, std::string &arg){
+		arg =  line.substr(1);
+	}
+	
+	template<class T>
+	int single_parser(	T &arg, 
+						std::fstream &file, 
+						std::string &cmd){
+		
+		std::string line;
+		std::getline(file, line);
+		file >> cmd;
+		
+		if((line[0] != ' ') || (line.size() <= 1)){
+			return -1;
+		} else {		
+			arg_save(line, arg);
+			return 0;
+		}
+	}
+	
+	void illumination_models_parser(	objl::mtl &material, 
+										std::fstream &mtl_file, 
+										std::string &cmd){		
+		if(single_parser<int>(material.illumination_models, mtl_file, cmd) != 0)
+			material.illumination_models = 0;
 	}
 	
 	void specular_exponent_parser(	objl::mtl &material, 
 									std::fstream &mtl_file, 
 									std::string &cmd){
-		mtl_file	>> material.specular_exponent >> cmd;
+		if(single_parser<float>(material.specular_exponent, mtl_file, cmd) != 0)
+			material.specular_exponent = 0;
+	}
+	
+	void texture_parser (		std::string &texture, 
+								std::fstream &mtl_file, 
+								std::string &cmd){
+		single_parser<std::string>(texture, mtl_file, cmd);
 	}
 }
