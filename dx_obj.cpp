@@ -52,7 +52,11 @@ D3DXMATRIX get_transform_matrix(dx_obj &obj){
 dx_obj load_file(const std::string& path, const std::string& filename){	
 	objl::object obj = objl::obj_loader(path, filename);
 	dx_obj result;
-	
+	/*
+			TO DO
+		parser materials
+		parser materials indices
+	*/
 	for(auto &current_triangle : obj.triangles){
 		
 		result.vertexes.push_back(create_vertex(
@@ -69,7 +73,7 @@ dx_obj load_file(const std::string& path, const std::string& filename){
 				obj.vertexes[current_triangle.vertex_third - 1],
 				obj.normals[current_triangle.normal_third - 1],
 				obj.textures_uv[current_triangle.uv_third - 1]));		
-	}	
+	}
 	return result;
 }
 

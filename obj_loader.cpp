@@ -1,5 +1,6 @@
 #include "obj_loader.hpp"
-#include "mtl_loader.hpp"
+
+#include <iostream>
 
 namespace{
 	void vertex_parser(	objl::object::vertex_container_type 	&vertexes,
@@ -22,6 +23,16 @@ namespace{
 						objl::object::vertex_container_type			&vertexes,
 						std::fstream 								&obj_file,
 						std::string									&next_cmd);
+	
+	void usemtl_parser(	objl::object::mtl_indices_container_type	&indices,
+						objl::object::triangle_container_type		&triangles,
+						std::fstream 								&obj_file,
+						std::string									&next_cmd);
+	
+	void usemtl_last_check(	objl::object::mtl_indices_container_type	&indices,
+							objl::object::triangle_container_type		&triangles);
+	
+	void mtl_debug_print(	objl::object::mtl_indices_container_type	&indices);
 }
 
 objl::object objl::obj_loader(const std::string& path, const std::string& filename){
@@ -48,11 +59,11 @@ objl::object objl::obj_loader(const std::string& path, const std::string& filena
 		} else if(cmd == "g"){
 			group_parser(load_objct.groups, load_objct.vertexes, obj_file, cmd);
 		} else if(cmd == "usemtl"){
-			obj_file >> cmd;	//TODO
+			usemtl_parser(load_objct.mtl_indices, load_objct.triangles, obj_file, cmd);
 		} else if(cmd == "mtllib"){
 			std::string mtl_file_name;
 			obj_file >> mtl_file_name;
-			objl::mtl_loader(path, mtl_file_name);
+			load_objct.materials = objl::mtl_loader(path, mtl_file_name);
 			obj_file >> cmd;
 		} else if(cmd == "o"){
 			obj_file >> cmd;	//TODO
@@ -60,6 +71,8 @@ objl::object objl::obj_loader(const std::string& path, const std::string& filena
 			obj_file >> cmd;		
 	}
 	
+	usemtl_last_check(load_objct.mtl_indices, load_objct.triangles);
+//	mtl_debug_print(load_objct.mtl_indices);
 	return load_objct;
 }
 
@@ -179,5 +192,34 @@ namespace{
 		groups.push_back(new_group);
 		
 		obj_file >> next_cmd;
+	}
+	
+	void usemtl_parser(	objl::object::mtl_indices_container_type	&indices,
+						objl::object::triangle_container_type		&triangles,
+						std::fstream 								&obj_file,
+						std::string									&next_cmd){
+		mtl_indices new_index{};
+		
+		obj_file >> new_index.name;
+		new_index.begin = triangles.size() + 1;
+		
+		usemtl_last_check(indices, triangles);
+		
+		indices.push_back(new_index);
+		
+		obj_file >> next_cmd;
+	}
+	
+	void usemtl_last_check(	objl::object::mtl_indices_container_type	&indices,
+							objl::object::triangle_container_type		&triangles){
+		if(indices.size() != 0)
+			indices.back().end = triangles.size();
+	}
+	
+	void mtl_debug_print(objl::object::mtl_indices_container_type	&indices){
+		for(auto &curr : indices){
+			std::cerr 	<< curr.name << ' ' << curr.begin << '-' << curr.end
+						<< std::endl;
+		}
 	}
 }

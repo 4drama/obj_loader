@@ -6,6 +6,9 @@
 
 #include <vector>
 #include <string>
+#include <map>
+
+#include "mtl_indices.hpp"
 
 struct vertex{
 	float x, y, z;
@@ -19,7 +22,9 @@ struct triangle{
 };
 
 struct dx_obj{
-	std::vector<vertex> vertexes;
+	std::vector<vertex> 				vertexes;
+	std::map<std::string, D3DMATERIAL9> materials;
+	std::deque<mtl_indices>				materials_indices;
 	
 	IDirect3DVertexBuffer9* VB = 0;
 	std::size_t triangles_size;

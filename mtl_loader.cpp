@@ -115,7 +115,9 @@ namespace{
 				mtl_file >> cmd;	
 		}
 		
-		debug_print(name, material);
+		materials[name] = material;
+		
+	//	debug_print(name, material);
 	}
 }
 
