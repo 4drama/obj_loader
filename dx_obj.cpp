@@ -85,7 +85,7 @@ dx_obj load_file(const std::string& path, const std::string& filename){
 	for(auto &current_index : obj.mtl_indices){
 		result.materials_indices.push_back( mtl_indices{
 			current_index.name, 
-			current_index.begin * 3, 
+			(current_index.begin * 3) - 3, 
 			(current_index.end * 3) - 1});
 	}
 	

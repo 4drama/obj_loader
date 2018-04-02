@@ -189,5 +189,6 @@ void dx_app::render(){
 		
 		this->device->DrawPrimitive(
 			D3DPT_TRIANGLELIST, curr_mtl_index.begin, curr_mtl_index.end);
+		
 	}
 }
