@@ -23,8 +23,9 @@ struct triangle{
 };
 
 struct material{
-	D3DMATERIAL9 	material;
-	std::string 	diffuse_texture_full_path;
+	D3DMATERIAL9 		material;
+	IDirect3DTexture9*	diffuse_texture = 0;
+	std::string 		diffuse_texture_full_path;
 };
 
 struct dx_obj{

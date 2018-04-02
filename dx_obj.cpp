@@ -132,4 +132,14 @@ void load_to_device(IDirect3DDevice9* device, dx_obj &obj){
 	}
 	obj.VB->Unlock();
 	obj.triangles_size = obj.vertexes.size() / 3;
+	
+	
+	for(auto &curr_mtl : obj.materials){
+		if(curr_mtl.second.diffuse_texture_full_path.size() != 0){
+			D3DXCreateTextureFromFile(
+				device,
+				curr_mtl.second.diffuse_texture_full_path.c_str(),
+				&curr_mtl.second.diffuse_texture);
+		}
+	}
 }
