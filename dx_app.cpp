@@ -38,11 +38,13 @@ dx_app::~dx_app(){
 
 void dx_app::setup(){
 	
-	this->main_cam.position = D3DXVECTOR3(3.0f, 0.0f, 2.0f);
+	D3DXVECTOR3 cam_pos(3.0f, 0.0f, 2.0f);
+	
+	this->main_cam.position = cam_pos;
 	this->main_cam.target = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	this->main_cam.up = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
 	
-	D3DLIGHT9 light = create_light(D3DXVECTOR3(3.0f, 0.0f, 2.0f));
+	D3DLIGHT9 light = create_light(cam_pos);
 	this->add_light(light, nullptr);
 	
 	D3DMATERIAL9 mtrl;
@@ -87,13 +89,15 @@ void dx_app::display(float time){
 		
 		this->set_view(this->main_cam);
 		
-		this->device->SetStreamSource(0, this->obj.VB, 0, sizeof(vertex));
+/*		this->device->SetStreamSource(0, this->obj.VB, 0, sizeof(vertex));
 		this->device->SetFVF(vertex::FVF);
 
 		D3DXMATRIX transform = get_transform_matrix(this->obj);
 		this->device->SetTransform(D3DTS_WORLD, &transform);
 		
-		this->device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, this->obj.triangles_size);
+		this->device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, this->obj.triangles_size);*/
+		
+		this->render();
 		
 		this->device->EndScene();
 		this->device->Present(0, 0, 0, 0);
@@ -154,4 +158,36 @@ int dx_app::msg_loop(){
 		}
 	}
 	return msg.wParam;	
+}
+
+void dx_app::render(){
+	
+	this->device->SetStreamSource(0, this->obj.VB, 0, sizeof(vertex));
+	this->device->SetFVF(vertex::FVF);
+
+	D3DXMATRIX transform = get_transform_matrix(this->obj);
+	this->device->SetTransform(D3DTS_WORLD, &transform);
+	
+//==================REMOVE===============	
+	IDirect3DTexture9* Tex = 0;
+//=======================================
+	
+	for(auto& curr_mtl_index : obj.materials_indices){
+		
+		this->device->SetMaterial(&obj.materials[curr_mtl_index.name].material);
+
+//==================REMOVE===============
+		if(obj.materials[curr_mtl_index.name].diffuse_texture_full_path.size() != 0){
+			D3DXCreateTextureFromFile(
+			this->device,
+			obj.materials[curr_mtl_index.name].diffuse_texture_full_path.c_str(),
+			&Tex);		
+			this->device->SetTexture(0, Tex);
+		} else
+			this->device->SetTexture(0, NULL);
+//=======================================
+		
+		this->device->DrawPrimitive(
+			D3DPT_TRIANGLELIST, curr_mtl_index.begin, curr_mtl_index.end);
+	}
 }

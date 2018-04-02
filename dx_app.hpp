@@ -35,6 +35,7 @@ private:
 	void cleanup();
 	void set_view(const camera &cam);
 	void set_perspective();
+	void render();
 	std::size_t add_light(D3DLIGHT9 light, D3DLIGHT9 **light_ptr);
 	void del_light(std::size_t index);
 };

@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <deque>
 
 #include "mtl_indices.hpp"
 
@@ -21,9 +22,14 @@ struct triangle{
 	std::size_t index[3];
 };
 
+struct material{
+	D3DMATERIAL9 	material;
+	std::string 	diffuse_texture_full_path;
+};
+
 struct dx_obj{
 	std::vector<vertex> 				vertexes;
-	std::map<std::string, D3DMATERIAL9> materials;
+	std::map<std::string, material> 	materials;
 	std::deque<mtl_indices>				materials_indices;
 	
 	IDirect3DVertexBuffer9* VB = 0;

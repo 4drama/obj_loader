@@ -42,6 +42,35 @@ namespace {
 		res.index[2] = first_index + 2;
 		return res;
 	}
+	
+	material create_material(objl::mtl &material_s, std::string path){		
+		material res{};
+		if(material_s.diffuse_texture.size() != 0){
+			res.diffuse_texture_full_path = path.append(material_s.diffuse_texture);
+		}
+		
+		res.material.Diffuse = D3DCOLORVALUE{
+			material_s.diffuse_color[0],
+			material_s.diffuse_color[1],
+			material_s.diffuse_color[2],
+			1.0f};
+		res.material.Ambient = D3DCOLORVALUE{
+			material_s.ambient_color[0],
+			material_s.ambient_color[1],
+			material_s.ambient_color[2],
+			1.0f
+			};
+		res.material.Specular = D3DCOLORVALUE{
+			material_s.specular_color[0],
+			material_s.specular_color[1],
+			material_s.specular_color[2],
+			1.0f
+			};
+			
+		res.material.Emissive = (D3DXCOLOR)D3DCOLOR_XRGB(0, 0, 0);
+		res.material.Power = material_s.specular_exponent; 	//????
+		return res;
+	}
 }
 
 D3DXMATRIX get_transform_matrix(dx_obj &obj){
@@ -52,11 +81,19 @@ D3DXMATRIX get_transform_matrix(dx_obj &obj){
 dx_obj load_file(const std::string& path, const std::string& filename){	
 	objl::object obj = objl::obj_loader(path, filename);
 	dx_obj result;
-	/*
-			TO DO
-		parser materials
-		parser materials indices
-	*/
+
+	for(auto &current_index : obj.mtl_indices){
+		result.materials_indices.push_back( mtl_indices{
+			current_index.name, 
+			current_index.begin * 3, 
+			(current_index.end * 3) - 1});
+	}
+	
+	for(auto &current_material : obj.materials){	
+		result.materials[current_material.first]
+			= create_material(current_material.second, path);
+	}
+	
 	for(auto &current_triangle : obj.triangles){
 		
 		result.vertexes.push_back(create_vertex(
