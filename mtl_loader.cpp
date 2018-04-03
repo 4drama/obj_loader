@@ -63,6 +63,10 @@ namespace{
 	void texture_parser (		std::string &texture, 
 								std::fstream &mtl_file, 
 								std::string &cmd);
+	
+	void transparent_parser (	objl::mtl &material, 
+								std::fstream &mtl_file, 
+								std::string &cmd);
 }
 
 namespace{
@@ -71,6 +75,7 @@ namespace{
 							std::string								&cmd){
 		std::string name;
 		objl::mtl material{};
+		material.transparent = 1.0f;
 		
 		mtl_file >> name >> cmd;
 		
@@ -86,7 +91,7 @@ namespace{
 			} else if (cmd == "Ns"){
 				specular_exponent_parser(material, mtl_file, cmd);
 			} else if (cmd == "d"){
-				mtl_file >> cmd;	//TODO
+				transparent_parser(material, mtl_file, cmd);
 			} else if (cmd == "Tr"){
 				mtl_file >> cmd;	//TODO
 			} else if (cmd == "illum"){
@@ -250,5 +255,12 @@ namespace{
 								std::fstream &mtl_file, 
 								std::string &cmd){
 		single_parser<std::string>(texture, mtl_file, cmd);
+	}
+	
+	void transparent_parser (	objl::mtl &material, 
+								std::fstream &mtl_file, 
+								std::string &cmd){
+		if(single_parser<float>(material.transparent, mtl_file, cmd) != 0)
+			material.transparent = 1;
 	}
 }

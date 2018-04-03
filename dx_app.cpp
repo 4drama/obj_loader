@@ -38,7 +38,7 @@ dx_app::~dx_app(){
 
 void dx_app::setup(){
 	
-	D3DXVECTOR3 cam_pos(3.0f, 0.0f, 2.0f);
+	D3DXVECTOR3 cam_pos(3.5f, 0.0f, 1.5f);
 	
 	this->main_cam.position = cam_pos;
 	this->main_cam.target = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -47,13 +47,10 @@ void dx_app::setup(){
 	D3DLIGHT9 light = create_light(cam_pos);
 	this->add_light(light, nullptr);
 	
-	D3DMATERIAL9 mtrl;
-		mtrl.Ambient = (D3DXCOLOR)D3DCOLOR_XRGB(255, 255, 255);
-		mtrl.Diffuse = (D3DXCOLOR)D3DCOLOR_XRGB(255, 255, 255);
-		mtrl.Specular = (D3DXCOLOR)D3DCOLOR_XRGB(255, 255, 255);
-		mtrl.Emissive = (D3DXCOLOR)D3DCOLOR_XRGB(0, 0, 0);
-		mtrl.Power = 2.0f;
-	this->device->SetMaterial(&mtrl);
+	this->device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+	this->device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+	this->device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	this->device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	
 	this->device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	this->device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
@@ -64,16 +61,15 @@ void dx_app::setup(){
 	this->device->SetRenderState(D3DRS_LIGHTING, true);
 	
 	this->set_perspective();
-	this->set_view(this->main_cam);
 	
 	this->obj = load_file("./challenger/", "CHALLENGER71.obj");
 	load_to_device(this->device, this->obj);
 	
-	D3DXMatrixScaling(&this->obj.scaling, 1, 1, 1);
-	D3DXMatrixTranslation(&this->obj.translation, 0, 0, 0);
-	D3DXMatrixRotationX(&this->obj.rotation_x, 0);
-	D3DXMatrixRotationY(&this->obj.rotation_y, 0);
-	D3DXMatrixRotationZ(&this->obj.rotation_z, 0);
+	this->obj.set_translation(0, 0, 0);
+	this->obj.set_scaling(1, 1, 1);
+	this->obj.rotation_x = 0;
+	this->obj.rotation_y = 0;
+	this->obj.rotation_z = 0;
 }
 
 void dx_app::cleanup(){
@@ -88,7 +84,8 @@ void dx_app::display(float time){
 		this->device->BeginScene();
 		
 		this->set_view(this->main_cam);
-
+		
+		this->obj.rotation_z += time / 3;
 		this->render();
 		
 		this->device->EndScene();
@@ -153,7 +150,6 @@ int dx_app::msg_loop(){
 }
 
 void dx_app::render(){
-	
 	this->device->SetStreamSource(0, this->obj.VB, 0, sizeof(vertex));
 	this->device->SetFVF(vertex::FVF);
 
@@ -161,6 +157,7 @@ void dx_app::render(){
 	this->device->SetTransform(D3DTS_WORLD, &transform);
 	
 	for(auto& curr_mtl_index : obj.materials_indices){
+		this->device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
 		
 		this->device->SetMaterial(&obj.materials[curr_mtl_index.name].material);
 		
@@ -170,8 +167,12 @@ void dx_app::render(){
 		else
 			this->device->SetTexture(0, NULL);
 		
+		if(obj.materials[curr_mtl_index.name].material.Diffuse.a != 1.0f){
+			this->device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+		}
+		
 		this->device->DrawPrimitive(
-			D3DPT_TRIANGLELIST, curr_mtl_index.begin, curr_mtl_index.end);
+				D3DPT_TRIANGLELIST, curr_mtl_index.begin, curr_mtl_index.end);
 		
 	}
 }

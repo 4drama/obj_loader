@@ -53,7 +53,7 @@ namespace {
 			material_s.diffuse_color[0],
 			material_s.diffuse_color[1],
 			material_s.diffuse_color[2],
-			1.0f};
+			material_s.transparent};
 		res.material.Ambient = D3DCOLORVALUE{
 			material_s.ambient_color[0],
 			material_s.ambient_color[1],
@@ -74,8 +74,28 @@ namespace {
 }
 
 D3DXMATRIX get_transform_matrix(dx_obj &obj){
-	return obj.scaling * obj.rotation_x
-			* obj.rotation_y * obj.rotation_z * obj.translation;
+	
+	D3DXMATRIX scaling;
+	D3DXMATRIX translation;
+	D3DXMATRIX rotation_x;
+	D3DXMATRIX rotation_y;
+	D3DXMATRIX rotation_z;
+	
+	D3DXMatrixScaling(&scaling, 
+		obj.scaling[0],
+		obj.scaling[1],
+		obj.scaling[2]);
+		
+	D3DXMatrixTranslation(&translation,
+		obj.translation[0],
+		obj.translation[1],
+		obj.translation[2]);
+		
+	D3DXMatrixRotationX(&rotation_x, obj.rotation_x);
+	D3DXMatrixRotationY(&rotation_y, obj.rotation_y);
+	D3DXMatrixRotationZ(&rotation_z, obj.rotation_z);
+	
+	return scaling * rotation_x	* rotation_y * rotation_z * translation;
 }
 
 dx_obj load_file(const std::string& path, const std::string& filename){	
